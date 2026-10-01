@@ -6,12 +6,17 @@ import streamlit as st
 
 from common import load_claims, load_models, load_report
 from src.models.explainability import global_importance
+from src.models.train_models import main as train_models
 
 st.set_page_config(page_title="ClaimIQ | Model Performance", layout="wide")
 st.title("Model Performance & Explainability")
 metrics = load_report("metrics.json")
 if not metrics:
-    st.warning("No metrics found. Run `python -m src.models.train_models`.")
+    with st.spinner("Preparing model artifacts and performance metrics..."):
+        train_models()
+    metrics = load_report("metrics.json")
+if not metrics:
+    st.error("Model metrics could not be generated.")
     st.stop()
 
 severity, risk = st.columns(2)
