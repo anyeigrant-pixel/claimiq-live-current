@@ -15,15 +15,15 @@ class ClaimModels:
 
     @staticmethod
     def _load_artifacts() -> tuple[Any, Any]:
-        """Load compatible model artifacts, rebuilding only after a known pickle mismatch."""
+        """Load model artifacts, rebuilding them when unavailable or incompatible."""
         try:
             return (
                 joblib.load(ART / "severity_model.joblib"),
                 joblib.load(ART / "risk_model.joblib"),
             )
-        except ModuleNotFoundError as error:
+        except (FileNotFoundError, ModuleNotFoundError) as error:
             LOGGER.warning(
-                "Model artifacts are incompatible with the current Python environment (%s); retraining locally.",
+                "Model artifacts are unavailable or incompatible with the current Python environment (%s); retraining locally.",
                 error,
             )
             train_models()
